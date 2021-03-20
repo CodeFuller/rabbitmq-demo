@@ -1,0 +1,15 @@
+﻿{
+	"rabbitMQ": {
+		"hostname": "localhost"
+	},
+
+	"logging": {
+		"defaultLogLevel": "Information",
+		"targets": [
+			{
+				"type": "Console",
+				"logLevel": "Information"
+			}
+		]
+	}
+}
