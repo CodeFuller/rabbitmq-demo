@@ -6,8 +6,9 @@ using CodeFuller.Library.Bootstrap;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
-namespace Sender
+namespace Receiver
 {
 	internal class ApplicationLogic : IApplicationLogic
 	{
@@ -21,7 +22,7 @@ namespace Sender
 			this.settings = options?.Value ?? throw new ArgumentNullException(nameof(options));
 		}
 
-		public Task<int> Run(string[] args, CancellationToken cancellationToken)
+		public async Task<int> Run(string[] args, CancellationToken cancellationToken)
 		{
 			var factory = new ConnectionFactory
 			{
@@ -36,13 +37,23 @@ namespace Sender
 
 			channel.QueueDeclare(queue: settings.QueueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 
-			logger.LogInformation("Publishing message ...");
-			var body = Encoding.UTF8.GetBytes("Hello World!");
-			channel.BasicPublish(exchange: String.Empty, routingKey: "hello", basicProperties: null, body: body);
+			var consumer = new EventingBasicConsumer(channel);
+			consumer.Received += (_, ea) =>
+			{
+				logger.LogInformation("Received!");
 
-			logger.LogInformation("The message was published successfully!");
+				var messageText = Encoding.UTF8.GetString(ea.Body.ToArray());
+				logger.LogInformation("Received message: {MessageText}", messageText);
+			};
 
-			return Task.FromResult(0);
+			await Task.Delay(TimeSpan.FromSeconds(3), cancellationToken);
+
+			logger.LogInformation("Consuming the messages. Press enter to exit.");
+			channel.BasicConsume(queue: settings.QueueName, autoAck: true, consumer: consumer);
+
+			Console.ReadLine();
+
+			return 0;
 		}
 	}
 }

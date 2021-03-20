@@ -1,4 +1,4 @@
-﻿namespace Sender
+﻿namespace Receiver
 {
 	internal class RabbitMQSettings
 	{
