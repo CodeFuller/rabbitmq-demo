@@ -38,7 +38,7 @@ namespace Sender
 
 			logger.LogInformation("Publishing message ...");
 			var body = Encoding.UTF8.GetBytes("Hello World!");
-			channel.BasicPublish(exchange: String.Empty, routingKey: "hello", basicProperties: null, body: body);
+			channel.BasicPublish(exchange: String.Empty, routingKey: settings.QueueName, basicProperties: null, body: body);
 
 			logger.LogInformation("The message was published successfully!");
 

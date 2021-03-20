@@ -22,7 +22,7 @@ namespace Receiver
 			this.settings = options?.Value ?? throw new ArgumentNullException(nameof(options));
 		}
 
-		public async Task<int> Run(string[] args, CancellationToken cancellationToken)
+		public Task<int> Run(string[] args, CancellationToken cancellationToken)
 		{
 			var factory = new ConnectionFactory
 			{
@@ -46,14 +46,12 @@ namespace Receiver
 				logger.LogInformation("Received message: {MessageText}", messageText);
 			};
 
-			await Task.Delay(TimeSpan.FromSeconds(3), cancellationToken);
-
 			logger.LogInformation("Consuming the messages. Press enter to exit.");
 			channel.BasicConsume(queue: settings.QueueName, autoAck: true, consumer: consumer);
 
 			Console.ReadLine();
 
-			return 0;
+			return Task.FromResult(0);
 		}
 	}
 }
