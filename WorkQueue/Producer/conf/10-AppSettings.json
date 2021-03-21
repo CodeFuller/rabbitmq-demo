@@ -1,0 +1,21 @@
+﻿{
+	"rabbitMQ": {
+		"hostname": "localhost",
+		"queueName": "test_work_queue"
+	},
+
+	"work": {
+		"tasksNumber": 10,
+		"maxTaskDuration": "00:00:10"
+	},
+
+	"logging": {
+		"defaultLogLevel": "Information",
+		"targets": [
+			{
+				"type": "Console",
+				"logLevel": "Information"
+			}
+		]
+	}
+}

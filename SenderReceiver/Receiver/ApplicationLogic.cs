@@ -40,8 +40,6 @@ namespace Receiver
 			var consumer = new EventingBasicConsumer(channel);
 			consumer.Received += (_, ea) =>
 			{
-				logger.LogInformation("Received!");
-
 				var messageText = Encoding.UTF8.GetString(ea.Body.ToArray());
 				logger.LogInformation("Received message: {MessageText}", messageText);
 			};

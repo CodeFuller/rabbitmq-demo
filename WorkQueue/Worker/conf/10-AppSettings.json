@@ -1,0 +1,16 @@
+﻿{
+	"rabbitMQ": {
+		"hostname": "localhost",
+		"queueName": "test_work_queue"
+	},
+
+	"logging": {
+		"defaultLogLevel": "Information",
+		"targets": [
+			{
+				"type": "Console",
+				"logLevel": "Information"
+			}
+		]
+	}
+}
