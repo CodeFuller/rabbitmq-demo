@@ -57,7 +57,7 @@ namespace Producer
 
 		private void ProduceTasks(IModel channel, IBasicProperties properties)
 		{
-			logger.LogInformation("Producing  {TasksNumber} work tasks ...", settings.Work.TasksNumber);
+			logger.LogInformation("Producing {TasksNumber} work tasks ...", settings.Work.TasksNumber);
 
 			for (var i = 1; i <= settings.Work.TasksNumber; ++i)
 			{

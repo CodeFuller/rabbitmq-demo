@@ -13,6 +13,8 @@ namespace Worker
 {
 	internal class ApplicationLogic : IApplicationLogic
 	{
+		private readonly Random random = new();
+
 		private readonly IPayloadDeserializer payloadDeserializer;
 
 		private readonly ILogger<ApplicationLogic> logger;
@@ -45,13 +47,7 @@ namespace Worker
 			channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
 			var consumer = new EventingBasicConsumer(channel);
-			consumer.Received += (_, ea) =>
-			{
-				var payload = payloadDeserializer.Deserialize(ea.Body.ToArray());
-				ProcessTask(payload);
-
-				channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-			};
+			consumer.Received += (_, ea) => ProcessMessage(channel, ea);
 
 			logger.LogInformation("Consuming the messages. Press enter to exit.");
 			channel.BasicConsume(queue: settings.QueueName, autoAck: false, consumer: consumer);
@@ -61,13 +57,42 @@ namespace Worker
 			return Task.FromResult(0);
 		}
 
+		private void ProcessMessage(IModel channel, BasicDeliverEventArgs ea)
+		{
+			try
+			{
+				var payload = payloadDeserializer.Deserialize(ea.Body.ToArray());
+				ProcessTask(payload);
+
+				channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+			}
+#pragma warning disable CA1031 // Do not catch general exception types
+			catch (Exception e)
+#pragma warning restore CA1031 // Do not catch general exception types
+			{
+				logger.LogError(e, "Failed to process message");
+
+				channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
+			}
+		}
+
 		private void ProcessTask(TaskPayload payload)
 		{
 			logger.LogInformation("Processing task: {TaskNumber} {TaskDuration}", payload.TaskNumber, payload.Duration);
 
 			Thread.Sleep(payload.Duration);
 
-			logger.LogInformation("The task was processed successfully: {TaskNumber} {TaskDuration}", payload.TaskNumber, payload.Duration);
+#pragma warning disable CA5394 // Do not use insecure randomness
+			var fail = random.Next(5) == 0;
+#pragma warning restore CA5394 // Do not use insecure randomness
+
+			if (fail)
+			{
+				logger.LogWarning("The task processing has failed: {TaskNumber} {TaskDuration}", payload.TaskNumber, payload.Duration);
+				throw new InvalidOperationException("The task processing has failed");
+			}
+
+			logger.LogInformation("The task processing has succeeded: {TaskNumber} {TaskDuration}", payload.TaskNumber, payload.Duration);
 		}
 	}
 }
