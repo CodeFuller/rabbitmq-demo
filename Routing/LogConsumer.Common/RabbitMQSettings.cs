@@ -1,4 +1,4 @@
-﻿namespace LogConsumer1
+﻿namespace LogConsumer.Common
 {
 	internal class RabbitMQSettings
 	{

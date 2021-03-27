@@ -8,15 +8,17 @@ using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace LogConsumer1
+namespace LogConsumer.Common
 {
 	internal class ApplicationLogic : IApplicationLogic
 	{
 		private readonly ILogger<ApplicationLogic> logger;
 
-		private readonly RabbitMQSettings settings;
+		private readonly ApplicationSettings settings;
 
-		public ApplicationLogic(ILogger<ApplicationLogic> logger, IOptions<RabbitMQSettings> options)
+		private RabbitMQSettings RabbitMQSettings => settings.RabbitMQ;
+
+		public ApplicationLogic(ILogger<ApplicationLogic> logger, IOptions<ApplicationSettings> options)
 		{
 			this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			this.settings = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -26,7 +28,7 @@ namespace LogConsumer1
 		{
 			var factory = new ConnectionFactory
 			{
-				HostName = settings.Hostname,
+				HostName = RabbitMQSettings.Hostname,
 			};
 
 			logger.LogInformation("Creating connection ...");
@@ -36,14 +38,15 @@ namespace LogConsumer1
 			using var channel = connection.CreateModel();
 
 			logger.LogInformation("Creating exchange ...");
-			channel.ExchangeDeclare(exchange: settings.ExchangeName, type: ExchangeType.Direct);
+			channel.ExchangeDeclare(exchange: RabbitMQSettings.ExchangeName, type: ExchangeType.Direct);
 
 			var queueInfo = channel.QueueDeclare();
 			logger.LogInformation("Created queue {QueueName}", queueInfo.QueueName);
 
-			channel.QueueBind(queue: queueInfo.QueueName, exchange: settings.ExchangeName, routingKey: "info");
-			channel.QueueBind(queue: queueInfo.QueueName, exchange: settings.ExchangeName, routingKey: "warning");
-			channel.QueueBind(queue: queueInfo.QueueName, exchange: settings.ExchangeName, routingKey: "error");
+			foreach (var logLevel in settings.LogLevels)
+			{
+				channel.QueueBind(queue: queueInfo.QueueName, exchange: RabbitMQSettings.ExchangeName, routingKey: logLevel);
+			}
 
 			var consumer = new EventingBasicConsumer(channel);
 			consumer.Received += (_, ea) =>

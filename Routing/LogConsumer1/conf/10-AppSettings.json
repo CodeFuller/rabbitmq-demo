@@ -1,4 +1,10 @@
 ﻿{
+	"logLevels": [
+		"info",
+		"warning",
+		"error"
+	],
+
 	"rabbitMQ": {
 		"hostname": "localhost",
 		"exchangeName": "test_routing"

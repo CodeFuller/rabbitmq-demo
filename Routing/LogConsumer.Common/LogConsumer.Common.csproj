@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -18,16 +17,6 @@
     <PackageReference Include="CodeFuller.Library.Logging" Version="7.0.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.321" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="conf/**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\LogConsumer.Common\LogConsumer.Common.csproj" />
   </ItemGroup>
 
 </Project>

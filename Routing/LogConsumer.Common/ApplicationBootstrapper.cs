@@ -4,13 +4,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace LogConsumer2
+namespace LogConsumer.Common
 {
-	internal class ApplicationBootstrapper : BasicApplicationBootstrapper<IApplicationLogic>
+	public class ApplicationBootstrapper : BasicApplicationBootstrapper<IApplicationLogic>
 	{
 		protected override void RegisterServices(IServiceCollection services, IConfiguration configuration)
 		{
-			services.Configure<RabbitMQSettings>(settings => configuration.Bind("rabbitMQ", settings));
+			services.Configure<ApplicationSettings>(configuration.Bind);
 
 			services.AddSingleton<IApplicationLogic, ApplicationLogic>();
 		}
