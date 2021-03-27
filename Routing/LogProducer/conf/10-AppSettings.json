@@ -1,0 +1,16 @@
+﻿{
+	"rabbitMQ": {
+		"hostname": "localhost",
+		"exchangeName": "test_routing"
+	},
+
+	"logging": {
+		"defaultLogLevel": "Information",
+		"targets": [
+			{
+				"type": "Console",
+				"logLevel": "Information"
+			}
+		]
+	}
+}
